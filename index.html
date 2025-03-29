@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friendora.space - Connect with Friends</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Friendora.space</h1>
+        <nav>
+            <ul id="navLinks">
+                <li id="authLink"><a href="signup.html">Signup</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="terms.html">Terms</a></li>
+                <li><a href="privacy.html">Privacy</a></li>
+                <li><a href="feed.html">Feed</a></li>
+                <li><a href="qans.html">Q/Ans</a></li>
+            </ul>
+            <div id="userDropdown" class="dropdown" style="display: none;">
+                <span id="usernameDisplay"></span>
+                <div class="dropdown-content">
+                    <a href="edit-profile.html">Edit Profile</a>
+                    <a href="profile.html">View Profile</a>
+                    <a href="login.html" id="logoutLink">Log Out</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="description">
+            <h2>Welcome to Friendora.space</h2>
+            <p>
+                Friendora.space is your go-to platform for connecting with friends, sharing moments, and discovering new people. 
+                Whether you're here to catch up with old pals, explore a vibrant community feed, or engage in Q&A discussions, 
+                Friendora.space offers a simple, secure, and fun way to stay connected. Join today and be part of a growing 
+                network built for real connections in a digital world.
+            </p>
+        </section>
+
+        <section class="search">
+            <form id="searchForm" onsubmit="handleSearch(event)">
+                <input type="text" id="searchInput" placeholder="Search for a user..." required>
+                <button type="submit">Search</button>
+            </form>
+            <p id="searchError" class="error"></p>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Friendora.space. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const API_KEY = '$2a$10$HNoicrOUVIdSCO7LAZz2t.3eGaPo9B2sdd.H/Kld6QJNV/putNShO';
+        const BIN_ID = '67e720848a456b79667ea63a';
+        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+        // Get logged-in user from localStorage
+        let loggedInUser = localStorage.getItem('loggedInUser') || null;
+
+        // Update navigation based on login status
+        function updateNavigation() {
+            const authLink = document.getElementById('authLink');
+            const userDropdown = document.getElementById('userDropdown');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+
+            // Re-fetch loggedInUser in case it changed
+            loggedInUser = localStorage.getItem('loggedInUser') || null;
+
+            if (loggedInUser) {
+                authLink.style.display = 'none';
+                userDropdown.style.display = 'inline-block';
+                usernameDisplay.textContent = loggedInUser;
+            } else {
+                authLink.style.display = 'inline-block'; // Ensure it reappears when logged out
+                authLink.innerHTML = '<a href="signup.html">Signup</a>';
+                userDropdown.style.display = 'none';
+            }
+        }
+
+        // Fetch users from JSONBin
+        async function fetchUsers() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': API_KEY
+                    }
+                });
+                if (!response.ok) throw new Error('Failed to fetch users');
+                const data = await response.json();
+                return data.record.users || [];
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                return [];
+            }
+        }
+
+        // Sanitize input to prevent XSS
+        function sanitizeInput(input) {
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML.replace(/[<>&"']/g, '');
+        }
+
+        // Handle search functionality
+        async function handleSearch(event) {
+            event.preventDefault();
+            const searchInput = sanitizeInput(document.getElementById('searchInput').value.trim());
+            const searchError = document.getElementById('searchError');
+
+            if (!searchInput || searchInput.length < 3) {
+                searchError.textContent = 'Search term must be at least 3 characters.';
+                return;
+            }
+
+            const users = await fetchUsers();
+            const foundUser = users.find(user => user.username === searchInput);
+
+            if (foundUser) {
+                window.location.href = `profile.html?username=${encodeURIComponent(foundUser.username)}`;
+            } else {
+                searchError.textContent = 'User not found.';
+            }
+        }
+
+        // Handle logout
+        document.getElementById('logoutLink').addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent immediate redirect
+            localStorage.removeItem('loggedInUser');
+            loggedInUser = null;
+            updateNavigation();
+            window.location.href = 'login.html'; // Redirect after logout
+        });
+
+        // Initialize page and listen for storage changes
+        window.onload = function() {
+            updateNavigation();
+        };
+
+        // Listen for changes in localStorage (e.g., from other tabs or signup/login)
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'loggedInUser') {
+                loggedInUser = localStorage.getItem('loggedInUser') || null;
+                updateNavigation();
+            }
+        });
+    </script>
+</body>
+</html>
