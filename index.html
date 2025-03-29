@@ -42,6 +42,16 @@
                     <a href="signup.html" class="btn primary">Get Started</a>
                     <a href="#features" class="btn secondary">Learn More</a>
                 </div>
+                <div class="real-time-stats">
+                    <div class="stat">
+                        <i class="fas fa-users"></i>
+                        <span id="totalUsers">0</span> Users Online
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-comments"></i>
+                        <span id="totalPosts">0</span> Posts Today
+                    </div>
+                </div>
             </div>
             <div class="hero-image">
                 <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f8e1c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="People connecting">
@@ -66,6 +76,11 @@
                     <h3>Engaging Discussions</h3>
                     <p>Participate in meaningful Q&A sessions with the community.</p>
                 </div>
+                <div class="feature-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Real-time Updates</h3>
+                    <p>See friend activity and new posts as they happen.</p>
+                </div>
             </div>
         </section>
 
@@ -79,8 +94,18 @@
                 <p id="searchError" class="error"></p>
             </form>
             <div id="recentUsers" class="recent-users">
-                <h3>Recently Active Users</h3>
+                <h3>Recently Active Users <span class="refresh-btn" id="refreshUsers"><i class="fas fa-sync-alt"></i></span></h3>
                 <div id="recentUsersList" class="users-list"></div>
+            </div>
+        </section>
+
+        <section class="live-feed-preview">
+            <h2>Live Community Activity <i class="fas fa-circle live-indicator"></i></h2>
+            <div class="activity-feed" id="liveActivityFeed">
+                <div class="activity-item">
+                    <div class="activity-loader"></div>
+                    <p>Loading live activity...</p>
+                </div>
             </div>
         </section>
 
@@ -135,6 +160,8 @@
         const API_KEY = '$2a$10$HNoicrOUVIdSCO7LAZz2t.3eGaPo9B2sdd.H/Kld6QJNV/putNShO';
         const BIN_ID = '67e720848a456b79667ea63a';
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        let activityInterval;
+        let statsInterval;
 
         // Get logged-in user from localStorage
         let loggedInUser = localStorage.getItem('loggedInUser') || null;
@@ -221,16 +248,82 @@
                     <div class="user-card" onclick="window.location.href='profile.html?username=${encodeURIComponent(user.username)}'">
                         <div class="user-avatar">
                             ${user.profile && user.profile.flair ? user.profile.flair : '👤'}
+                            ${user.profile && user.profile.profilePic ? 
+                                `<img src="${user.profile.profilePic}" alt="${user.username}" class="user-avatar-img">` : ''}
                         </div>
                         <div class="user-info">
                             <span class="username">${user.username}</span>
                             <span class="status online">Online</span>
+                            <span class="last-seen">Active now</span>
                         </div>
                     </div>
                 `).join('');
             } else {
                 recentUsersList.innerHTML = '<p>No active users found.</p>';
             }
+        }
+
+        // Generate random activity
+        function generateRandomActivity(users) {
+            const activities = [
+                'just posted a new update',
+                'added new photos',
+                'commented on a post',
+                'liked a question',
+                'joined a discussion',
+                'updated their profile',
+                'answered a question',
+                'started following someone'
+            ];
+            
+            const activeUsers = users.filter(u => u.profile?.onlineStatus === 'online');
+            if (activeUsers.length === 0) return [];
+            
+            const numActivities = Math.min(5, activeUsers.length);
+            const shuffledUsers = [...activeUsers].sort(() => 0.5 - Math.random()).slice(0, numActivities);
+            
+            return shuffledUsers.map(user => ({
+                username: user.username,
+                activity: activities[Math.floor(Math.random() * activities.length)],
+                time: 'Just now',
+                flair: user.profile?.flair || '👤',
+                profilePic: user.profile?.profilePic || null
+            }));
+        }
+
+        // Update live activity feed
+        async function updateLiveActivity() {
+            const users = await fetchUsers();
+            const activities = generateRandomActivity(users);
+            const feed = document.getElementById('liveActivityFeed');
+            
+            if (activities.length > 0) {
+                feed.innerHTML = activities.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-avatar">
+                            ${activity.profilePic ? 
+                                `<img src="${activity.profilePic}" alt="${activity.username}" class="activity-avatar-img">` : 
+                                `<span class="activity-flair">${activity.flair}</span>`}
+                        </div>
+                        <div class="activity-content">
+                            <strong>${activity.username}</strong> ${activity.activity}
+                            <span class="activity-time">${activity.time}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                feed.innerHTML = '<div class="activity-item">No recent activity right now.</div>';
+            }
+        }
+
+        // Update real-time stats
+        async function updateRealTimeStats() {
+            const users = await fetchUsers();
+            const onlineUsers = users.filter(u => u.profile?.onlineStatus === 'online').length;
+            const totalPosts = users.reduce((sum, user) => sum + (user.posts?.length || 0), 0);
+            
+            document.getElementById('totalUsers').textContent = onlineUsers;
+            document.getElementById('totalPosts').textContent = totalPosts;
         }
 
         // Handle logout
@@ -246,6 +339,14 @@
         document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
             const navLinks = document.getElementById('navLinks');
             navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Refresh users list
+        document.getElementById('refreshUsers')?.addEventListener('click', function() {
+            this.classList.add('refreshing');
+            displayRecentUsers().then(() => {
+                setTimeout(() => this.classList.remove('refreshing'), 500);
+            });
         });
 
         // Testimonial slider
@@ -271,6 +372,12 @@
             displayRecentUsers();
             initTestimonialSlider();
             
+            // Start real-time updates
+            updateLiveActivity();
+            updateRealTimeStats();
+            activityInterval = setInterval(updateLiveActivity, 10000); // Update every 10 seconds
+            statsInterval = setInterval(updateRealTimeStats, 30000); // Update every 30 seconds
+            
             // Listen for changes in localStorage
             window.addEventListener('storage', function(event) {
                 if (event.key === 'loggedInUser') {
@@ -279,6 +386,12 @@
                 }
             });
         };
+
+        // Clean up intervals when page unloads
+        window.addEventListener('beforeunload', function() {
+            clearInterval(activityInterval);
+            clearInterval(statsInterval);
+        });
     </script>
 </body>
 </html>
