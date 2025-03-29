@@ -1,0 +1,117 @@
+/* Global Styles */
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f8f8;
+  color: #444;
+  line-height: 1.5;
+}
+
+.container {
+  width: 90%;
+  max-width: 650px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 2px;
+}
+
+h1, h2, h3 {
+  color: #333;
+  text-align: center;
+  font-weight: normal;
+  margin-bottom: 8px;
+}
+
+/* Forms (Signup & Login) */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+input, textarea, button {
+  padding: 7px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  font-size: 14px;
+  background: #fff;
+}
+
+button {
+  background-color: #555;
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+button:hover {
+  background-color: #444;
+}
+
+/* Navigation */
+nav {
+  background: #fff;
+  padding: 6px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+nav a {
+  margin: 0 6px;
+  text-decoration: none;
+  color: #555;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: #333;
+}
+
+/* Profile Pages */
+.profile-container {
+  text-align: center;
+  padding: 8px;
+}
+
+.profile-picture {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin-bottom: 5px;
+}
+
+/* Feeds Page */
+.feed-item {
+  border-bottom: 1px solid #eee;
+  padding: 8px;
+}
+
+.feed-item:last-child {
+  border-bottom: none;
+}
+
+/* Text-Based Pages */
+.text-page {
+  padding: 10px;
+  background: white;
+}
+
+/* Contact Page */
+.contact-form {
+  max-width: 450px;
+  margin: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .container {
+    width: 95%;
+  }
+  nav a {
+    display: block;
+    margin-bottom: 5px;
+  }
+}
