@@ -5,37 +5,173 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friendora.space - Profile</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
-        <h1>Friendora.space</h1>
-    </header>
-    <main>
-        <h2 id="usernameTitle">Profile</h2>
-        <div class="profile-container">
-            <img id="profilePic" src="" alt="Profile Picture" style="display: none; max-width: 150px;">
-            <p><strong>Username:</strong> <span id="username"></span></p>
-            <p><strong>Nickname:</strong> <span id="nickname"></span></p>
-            <p><strong>Age:</strong> <span id="age"></span></p>
-            <p><strong>Height:</strong> <span id="height"></span> cm</p>
-            <p><strong>Bio:</strong> <span id="bio"></span></p>
-            <p><strong>College/School:</strong> <span id="education"></span></p>
-            <p><strong>Interests:</strong> <span id="interests"></span></p>
-            <p><strong>Flair:</strong> <span id="flair"></span></p>
-            <p><strong>Hobbies:</strong> <span id="hobbies"></span></p>
-            <p><strong>Favorite Things to Do:</strong> <span id="favThings"></span></p>
-            <p><strong>Relationship Status:</strong> <span id="relationship"></span></p>
-            <p><strong>Contact:</strong> <span id="contact"></span></p>
-            <p><strong>Status:</strong> <span id="onlineStatus"></span></p>
+        <div class="header-container">
+            <h1><i class="fas fa-users"></i> Friendora.space</h1>
+            <nav>
+                <ul id="navLinks">
+                    <li id="authLink"><a href="signup.html"><i class="fas fa-user-plus"></i> Signup</a></li>
+                    <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="feed.html"><i class="fas fa-newspaper"></i> Feed</a></li>
+                    <li><a href="qans.html"><i class="fas fa-question-circle"></i> Q/Ans</a></li>
+                </ul>
+                <div id="userDropdown" class="dropdown" style="display: none;">
+                    <span id="usernameDisplay"><i class="fas fa-user-circle"></i> <span id="usernameText"></span></span>
+                    <div class="dropdown-content">
+                        <a href="edit-profile.html"><i class="fas fa-user-edit"></i> Edit Profile</a>
+                        <a href="profile.html"><i class="fas fa-user"></i> View Profile</a>
+                        <a href="login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    </div>
+                </div>
+            </nav>
+            <button id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
         </div>
+    </header>
+
+    <main class="profile-main">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <div id="avatarPlaceholder">
+                    <span id="avatarFlair">👤</span>
+                </div>
+                <img id="profilePic" src="" alt="Profile Picture" style="display: none;">
+            </div>
+            <div class="profile-info">
+                <h1 id="usernameTitle">Profile</h1>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <span class="stat-number" id="friendsCount">0</span>
+                        <span class="stat-label">Friends</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="postsCount">0</span>
+                        <span class="stat-label">Posts</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="questionsCount">0</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button id="messageBtn" class="btn"><i class="fas fa-envelope"></i> Message</button>
+                    <button id="friendBtn" class="btn"><i class="fas fa-user-plus"></i> Add Friend</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-content">
+            <div class="profile-details">
+                <h2><i class="fas fa-info-circle"></i> About</h2>
+                <div class="detail-item">
+                    <i class="fas fa-user-tag"></i>
+                    <div>
+                        <span class="detail-label">Nickname:</span>
+                        <span id="nickname" class="detail-value">Not set</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-birthday-cake"></i>
+                    <div>
+                        <span class="detail-label">Age:</span>
+                        <span id="age" class="detail-value">Not set</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-ruler-vertical"></i>
+                    <div>
+                        <span class="detail-label">Height:</span>
+                        <span id="height" class="detail-value">Not set</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <div>
+                        <span class="detail-label">College/School:</span>
+                        <span id="education" class="detail-value">Not set</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-heart"></i>
+                    <div>
+                        <span class="detail-label">Relationship Status:</span>
+                        <span id="relationship" class="detail-value">Not set</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-phone"></i>
+                    <div>
+                        <span class="detail-label">Contact:</span>
+                        <span id="contact" class="detail-value">Not set</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-circle"></i>
+                    <div>
+                        <span class="detail-label">Status:</span>
+                        <span id="onlineStatus" class="detail-value">Not set</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-bio">
+                <h2><i class="fas fa-book-open"></i> Bio</h2>
+                <p id="bio">No bio yet.</p>
+            </div>
+
+            <div class="profile-interests">
+                <h2><i class="fas fa-star"></i> Interests & Hobbies</h2>
+                <div class="tags-container" id="interestsContainer"></div>
+                
+                <h3><i class="fas fa-gamepad"></i> Hobbies</h3>
+                <div class="tags-container" id="hobbiesContainer"></div>
+                
+                <h3><i class="fas fa-heart"></i> Favorite Things</h3>
+                <div class="tags-container" id="favThingsContainer"></div>
+            </div>
+
+            <div class="profile-friends">
+                <h2><i class="fas fa-user-friends"></i> Friends</h2>
+                <div class="friends-list" id="friendsList">
+                    <p>No friends to display.</p>
+                </div>
+            </div>
+        </div>
+
         <p id="error" class="error"></p>
     </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 Friendora.space. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
         const API_KEY = '$2a$10$HNoicrOUVIdSCO7LAZz2t.3eGaPo9B2sdd.H/Kld6QJNV/putNShO';
         const BIN_ID = '67e720848a456b79667ea63a';
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        const loggedInUser = localStorage.getItem('loggedInUser');
 
+        // Update navigation based on login status
+        function updateNavigation() {
+            const authLink = document.getElementById('authLink');
+            const userDropdown = document.getElementById('userDropdown');
+            const usernameText = document.getElementById('usernameText');
+
+            if (loggedInUser) {
+                authLink.style.display = 'none';
+                userDropdown.style.display = 'inline-block';
+                usernameText.textContent = loggedInUser;
+            } else {
+                authLink.style.display = 'inline-block';
+                userDropdown.style.display = 'none';
+            }
+        }
+
+        // Fetch users from JSONBin
         async function fetchUsers() {
             try {
                 const response = await fetch(API_URL, {
@@ -51,11 +187,26 @@
             }
         }
 
+        // Create tag elements from comma-separated string
+        function createTags(containerId, items) {
+            const container = document.getElementById(containerId);
+            if (!items || items.trim() === '') {
+                container.innerHTML = '<span class="empty-tag">Not specified</span>';
+                return;
+            }
+            
+            container.innerHTML = items.split(',').map(item => 
+                `<span class="tag">${item.trim()}</span>`
+            ).join('');
+        }
+
+        // Load profile data
         async function loadProfile() {
+            updateNavigation();
+            
             const params = new URLSearchParams(window.location.search);
             const urlUsername = params.get('username');
-            const loggedInUser = localStorage.getItem('loggedInUser');
-            const username = urlUsername || loggedInUser; // Prefer URL param, fallback to logged-in user
+            const username = urlUsername || loggedInUser;
             const errorElement = document.getElementById('error');
 
             if (!username) {
@@ -74,29 +225,64 @@
 
             // Display profile data
             document.getElementById('usernameTitle').textContent = `${username}'s Profile`;
-            document.getElementById('username').textContent = username;
             const profile = user.profile || {};
 
+            // Avatar/Profile Picture
             if (profile.profilePic) {
                 document.getElementById('profilePic').src = profile.profilePic;
                 document.getElementById('profilePic').style.display = 'block';
-            } else {
-                document.getElementById('profilePic').style.display = 'none';
+                document.getElementById('avatarPlaceholder').style.display = 'none';
+            } else if (profile.flair) {
+                document.getElementById('avatarFlair').textContent = profile.flair;
             }
 
+            // Basic info
             document.getElementById('nickname').textContent = profile.nickname || 'Not set';
             document.getElementById('age').textContent = profile.age || 'Not set';
-            document.getElementById('height').textContent = profile.height || 'Not set';
-            document.getElementById('bio').textContent = profile.bio || 'Not set';
+            document.getElementById('height').textContent = profile.height ? `${profile.height} cm` : 'Not set';
+            document.getElementById('bio').textContent = profile.bio || 'No bio yet.';
             document.getElementById('education').textContent = profile.education || 'Not set';
-            document.getElementById('interests').textContent = profile.interests || 'Not set';
-            document.getElementById('flair').textContent = profile.flair || 'Not set';
-            document.getElementById('hobbies').textContent = profile.hobbies || 'Not set';
-            document.getElementById('favThings').textContent = profile.favThings || 'Not set';
             document.getElementById('relationship').textContent = profile.relationship || 'Not set';
             document.getElementById('contact').textContent = profile.contact || 'Not set';
-            document.getElementById('onlineStatus').textContent = profile.onlineStatus || 'Not set';
+            
+            // Online status with color coding
+            const onlineStatusElement = document.getElementById('onlineStatus');
+            if (profile.onlineStatus === 'online') {
+                onlineStatusElement.textContent = 'Online';
+                onlineStatusElement.classList.add('online');
+            } else {
+                onlineStatusElement.textContent = 'Offline';
+                onlineStatusElement.classList.add('offline');
+            }
+
+            // Tags
+            createTags('interestsContainer', profile.interests);
+            createTags('hobbiesContainer', profile.hobbies);
+            createTags('favThingsContainer', profile.favThings);
+
+            // Stats (simulated)
+            document.getElementById('friendsCount').textContent = Math.floor(Math.random() * 100);
+            document.getElementById('postsCount').textContent = Math.floor(Math.random() * 50);
+            document.getElementById('questionsCount').textContent = Math.floor(Math.random() * 30);
+
+            // Friend button logic
+            const friendBtn = document.getElementById('friendBtn');
+            if (loggedInUser === username) {
+                friendBtn.style.display = 'none';
+                document.getElementById('messageBtn').style.display = 'none';
+            } else {
+                friendBtn.addEventListener('click', () => {
+                    friendBtn.innerHTML = '<i class="fas fa-check"></i> Friend Request Sent';
+                    friendBtn.disabled = true;
+                });
+            }
         }
+
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        });
 
         window.onload = function() {
             loadProfile();
