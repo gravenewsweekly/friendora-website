@@ -163,6 +163,7 @@
             <div class="form-actions">
                 <button type="submit" class="btn primary"><i class="fas fa-save"></i> Save Profile</button>
                 <button type="button" class="btn secondary" onclick="window.location.href='profile.html'">Cancel</button>
+                <button type="button" class="btn danger" id="deleteAccountBtn"><i class="fas fa-trash"></i> Delete Account</button>
             </div>
         </form>
         
@@ -178,6 +179,17 @@
                 </div>
                 <div class="emoji-grid" id="emojiGrid"></div>
                 <button type="button" class="close-emoji-picker" id="closeEmojiPicker">Close</button>
+            </div>
+        </div>
+
+        <div class="confirmation-modal" id="deleteAccountModal">
+            <div class="modal-content">
+                <h3>Confirm Account Deletion</h3>
+                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                <div class="modal-actions">
+                    <button class="btn danger" id="confirmDeleteBtn">Delete Account</button>
+                    <button class="btn secondary" id="cancelDeleteBtn">Cancel</button>
+                </div>
             </div>
         </div>
     </main>
@@ -245,6 +257,29 @@
             }
         }
 
+        // Delete user account
+        async function deleteAccount(username) {
+            try {
+                const users = await fetchUsers();
+                const updatedUsers = users.filter(u => u.username !== username);
+                
+                const response = await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify({ users: updatedUsers })
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete account');
+                return true;
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                return false;
+            }
+        }
+
         // Sanitize input
         function sanitizeInput(input) {
             const div = document.createElement('div');
@@ -285,6 +320,7 @@
             document.getElementById('relationship').value = profile.relationship || '';
             document.getElementById('contact').value = profile.contact || '';
             document.querySelector(`input[name="onlineStatus"][value="${profile.onlineStatus || 'online'}"]`).checked = true;
+            document.getElementById('profileVisibility').value = profile.profileVisibility || 'public';
             
             // Profile picture
             if (profile.profilePic) {
@@ -316,12 +352,24 @@
         document.getElementById('profilePic').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                    document.getElementById('error').textContent = 'Image size must be less than 2MB';
+                    return;
+                }
+                
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    document.getElementById('error').textContent = 'Only JPG, PNG, or GIF images are allowed';
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const preview = document.getElementById('previewPic');
                     preview.src = e.target.result;
                     preview.style.display = 'block';
                     document.getElementById('avatarFlairPreview').style.display = 'none';
+                    document.getElementById('error').textContent = '';
                 };
                 reader.readAsDataURL(file);
             }
@@ -441,6 +489,40 @@
             }
         }
 
+        // Handle account deletion
+        function initDeleteAccount() {
+            const deleteBtn = document.getElementById('deleteAccountBtn');
+            const modal = document.getElementById('deleteAccountModal');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            const cancelBtn = document.getElementById('cancelDeleteBtn');
+            
+            deleteBtn.addEventListener('click', function() {
+                modal.style.display = 'flex';
+            });
+            
+            cancelBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            confirmBtn.addEventListener('click', async function() {
+                const success = await deleteAccount(loggedInUser);
+                if (success) {
+                    localStorage.removeItem('loggedInUser');
+                    window.location.href = 'index.html';
+                } else {
+                    document.getElementById('error').textContent = 'Failed to delete account. Please try again.';
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
         // Mobile menu toggle
         document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
             const navLinks = document.getElementById('navLinks');
@@ -451,6 +533,7 @@
         window.onload = function() {
             loadProfile();
             initEmojiPicker();
+            initDeleteAccount();
             
             // Bio character count
             document.getElementById('bio').addEventListener('input', updateBioCharCount);
