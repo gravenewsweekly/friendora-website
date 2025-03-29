@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friendora.space - Profile</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Friendora.space</h1>
+    </header>
+    <main>
+        <h2 id="usernameTitle">Profile</h2>
+        <div class="profile-container">
+            <img id="profilePic" src="" alt="Profile Picture" style="display: none; max-width: 150px;">
+            <p><strong>Username:</strong> <span id="username"></span></p>
+            <p><strong>Nickname:</strong> <span id="nickname"></span></p>
+            <p><strong>Age:</strong> <span id="age"></span></p>
+            <p><strong>Height:</strong> <span id="height"></span> cm</p>
+            <p><strong>Bio:</strong> <span id="bio"></span></p>
+            <p><strong>College/School:</strong> <span id="education"></span></p>
+            <p><strong>Interests:</strong> <span id="interests"></span></p>
+            <p><strong>Flair:</strong> <span id="flair"></span></p>
+            <p><strong>Hobbies:</strong> <span id="hobbies"></span></p>
+            <p><strong>Favorite Things to Do:</strong> <span id="favThings"></span></p>
+            <p><strong>Relationship Status:</strong> <span id="relationship"></span></p>
+            <p><strong>Contact:</strong> <span id="contact"></span></p>
+            <p><strong>Status:</strong> <span id="onlineStatus"></span></p>
+        </div>
+        <p id="error" class="error"></p>
+    </main>
+
+    <script>
+        const API_KEY = '$2a$10$HNoicrOUVIdSCO7LAZz2t.3eGaPo9B2sdd.H/Kld6QJNV/putNShO';
+        const BIN_ID = '67e720848a456b79667ea63a';
+        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+        async function fetchUsers() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+                if (!response.ok) throw new Error('Failed to fetch users');
+                const data = await response.json();
+                return data.record.users || [];
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                return [];
+            }
+        }
+
+        async function loadProfile() {
+            const params = new URLSearchParams(window.location.search);
+            const urlUsername = params.get('username');
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const username = urlUsername || loggedInUser; // Prefer URL param, fallback to logged-in user
+            const errorElement = document.getElementById('error');
+
+            if (!username) {
+                errorElement.textContent = 'No user specified. Please log in or search for a user.';
+                return;
+            }
+
+            const users = await fetchUsers();
+            const user = users.find(u => u.username === username);
+
+            if (!user) {
+                errorElement.textContent = 'User not found.';
+                document.getElementById('usernameTitle').textContent = 'Profile Not Found';
+                return;
+            }
+
+            // Display profile data
+            document.getElementById('usernameTitle').textContent = `${username}'s Profile`;
+            document.getElementById('username').textContent = username;
+            const profile = user.profile || {};
+
+            if (profile.profilePic) {
+                document.getElementById('profilePic').src = profile.profilePic;
+                document.getElementById('profilePic').style.display = 'block';
+            } else {
+                document.getElementById('profilePic').style.display = 'none';
+            }
+
+            document.getElementById('nickname').textContent = profile.nickname || 'Not set';
+            document.getElementById('age').textContent = profile.age || 'Not set';
+            document.getElementById('height').textContent = profile.height || 'Not set';
+            document.getElementById('bio').textContent = profile.bio || 'Not set';
+            document.getElementById('education').textContent = profile.education || 'Not set';
+            document.getElementById('interests').textContent = profile.interests || 'Not set';
+            document.getElementById('flair').textContent = profile.flair || 'Not set';
+            document.getElementById('hobbies').textContent = profile.hobbies || 'Not set';
+            document.getElementById('favThings').textContent = profile.favThings || 'Not set';
+            document.getElementById('relationship').textContent = profile.relationship || 'Not set';
+            document.getElementById('contact').textContent = profile.contact || 'Not set';
+            document.getElementById('onlineStatus').textContent = profile.onlineStatus || 'Not set';
+        }
+
+        window.onload = function() {
+            loadProfile();
+        };
+    </script>
+</body>
+</html>
