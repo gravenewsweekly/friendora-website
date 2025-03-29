@@ -38,9 +38,11 @@
                     <span id="avatarFlair">👤</span>
                 </div>
                 <img id="profilePic" src="" alt="Profile Picture" style="display: none;">
+                <div class="online-status-indicator" id="onlineStatusIndicator"></div>
             </div>
             <div class="profile-info">
                 <h1 id="usernameTitle">Profile</h1>
+                <div class="last-seen" id="lastSeen">Last seen: loading...</div>
                 <div class="profile-stats">
                     <div class="stat">
                         <span class="stat-number" id="friendsCount">0</span>
@@ -58,6 +60,7 @@
                 <div class="profile-actions">
                     <button id="messageBtn" class="btn"><i class="fas fa-envelope"></i> Message</button>
                     <button id="friendBtn" class="btn"><i class="fas fa-user-plus"></i> Add Friend</button>
+                    <button id="followBtn" class="btn secondary" style="display: none;"><i class="fas fa-user-plus"></i> Follow</button>
                 </div>
             </div>
         </div>
@@ -133,9 +136,19 @@
             </div>
 
             <div class="profile-friends">
-                <h2><i class="fas fa-user-friends"></i> Friends</h2>
+                <h2><i class="fas fa-user-friends"></i> Friends <span class="refresh-btn" id="refreshFriends"><i class="fas fa-sync-alt"></i></span></h2>
                 <div class="friends-list" id="friendsList">
-                    <p>No friends to display.</p>
+                    <p>Loading friends...</p>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                <div class="activity-feed" id="userActivityFeed">
+                    <div class="activity-item">
+                        <div class="activity-loader"></div>
+                        <p>Loading activity...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -154,6 +167,7 @@
         const BIN_ID = '67e720848a456b79667ea63a';
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
         const loggedInUser = localStorage.getItem('loggedInUser');
+        let profileUpdateInterval;
 
         // Update navigation based on login status
         function updateNavigation() {
@@ -200,6 +214,99 @@
             ).join('');
         }
 
+        // Generate random activity for user
+        function generateUserActivity() {
+            const activities = [
+                'Posted a new update',
+                'Added new photos',
+                'Commented on a post',
+                'Liked a question',
+                'Joined a discussion',
+                'Updated their profile',
+                'Answered a question',
+                'Started following someone'
+            ];
+            
+            const numActivities = 3 + Math.floor(Math.random() * 3); // 3-5 activities
+            const result = [];
+            
+            for (let i = 0; i < numActivities; i++) {
+                const hoursAgo = i * 2;
+                result.push({
+                    action: activities[Math.floor(Math.random() * activities.length)],
+                    time: hoursAgo === 0 ? 'Just now' : `${hoursAgo} hours ago`
+                });
+            }
+            
+            return result;
+        }
+
+        // Update user activity feed
+        function updateUserActivityFeed(username) {
+            const activities = generateUserActivity();
+            const feed = document.getElementById('userActivityFeed');
+            
+            feed.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="activity-content">
+                        <strong>${username}</strong> ${activity.action}
+                        <span class="activity-time">${activity.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Display friends list
+        async function displayFriends(username) {
+            const users = await fetchUsers();
+            const currentUser = users.find(u => u.username === username);
+            const friendsList = document.getElementById('friendsList');
+            
+            if (!currentUser || !currentUser.friends || currentUser.friends.length === 0) {
+                friendsList.innerHTML = '<p>No friends to display.</p>';
+                return;
+            }
+            
+            // Get friend profiles
+            const friends = currentUser.friends
+                .map(friendName => users.find(u => u.username === friendName))
+                .filter(Boolean)
+                .slice(0, 6); // Show first 6 friends
+            
+            if (friends.length > 0) {
+                friendsList.innerHTML = friends.map(friend => `
+                    <div class="friend-card" onclick="window.location.href='profile.html?username=${encodeURIComponent(friend.username)}'">
+                        <div class="friend-avatar">
+                            ${friend.profile?.flair || '👤'}
+                            ${friend.profile?.profilePic ? 
+                                `<img src="${friend.profile.profilePic}" alt="${friend.username}" class="friend-avatar-img">` : ''}
+                            <div class="friend-status ${friend.profile?.onlineStatus === 'online' ? 'online' : 'offline'}"></div>
+                        </div>
+                        <div class="friend-info">
+                            <span class="friend-name">${friend.username}</span>
+                            <span class="friend-status-text">${friend.profile?.onlineStatus === 'online' ? 'Online' : 'Offline'}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Add "View All" button if more than 6 friends
+                if (currentUser.friends.length > 6) {
+                    friendsList.innerHTML += `
+                        <div class="view-all-friends">
+                            <button class="btn secondary" onclick="window.location.href='friends.html?username=${encodeURIComponent(username)}'">
+                                View All ${currentUser.friends.length} Friends
+                            </button>
+                        </div>
+                    `;
+                }
+            } else {
+                friendsList.innerHTML = '<p>No friends to display.</p>';
+            }
+        }
+
         // Load profile data
         async function loadProfile() {
             updateNavigation();
@@ -236,6 +343,16 @@
                 document.getElementById('avatarFlair').textContent = profile.flair;
             }
 
+            // Online status indicator
+            const onlineStatusIndicator = document.getElementById('onlineStatusIndicator');
+            if (profile.onlineStatus === 'online') {
+                onlineStatusIndicator.classList.add('online');
+                onlineStatusIndicator.title = 'Online now';
+            } else {
+                onlineStatusIndicator.classList.add('offline');
+                onlineStatusIndicator.title = 'Offline';
+            }
+
             // Basic info
             document.getElementById('nickname').textContent = profile.nickname || 'Not set';
             document.getElementById('age').textContent = profile.age || 'Not set';
@@ -250,9 +367,11 @@
             if (profile.onlineStatus === 'online') {
                 onlineStatusElement.textContent = 'Online';
                 onlineStatusElement.classList.add('online');
+                document.getElementById('lastSeen').textContent = 'Active now';
             } else {
                 onlineStatusElement.textContent = 'Offline';
                 onlineStatusElement.classList.add('offline');
+                document.getElementById('lastSeen').textContent = 'Last seen: a while ago';
             }
 
             // Tags
@@ -261,22 +380,76 @@
             createTags('favThingsContainer', profile.favThings);
 
             // Stats (simulated)
-            document.getElementById('friendsCount').textContent = Math.floor(Math.random() * 100);
-            document.getElementById('postsCount').textContent = Math.floor(Math.random() * 50);
-            document.getElementById('questionsCount').textContent = Math.floor(Math.random() * 30);
+            document.getElementById('friendsCount').textContent = user.friends?.length || 0;
+            document.getElementById('postsCount').textContent = user.posts?.length || 0;
+            document.getElementById('questionsCount').textContent = user.questions?.length || 0;
 
             // Friend button logic
             const friendBtn = document.getElementById('friendBtn');
+            const followBtn = document.getElementById('followBtn');
             if (loggedInUser === username) {
                 friendBtn.style.display = 'none';
+                followBtn.style.display = 'none';
                 document.getElementById('messageBtn').style.display = 'none';
             } else {
                 friendBtn.addEventListener('click', () => {
                     friendBtn.innerHTML = '<i class="fas fa-check"></i> Friend Request Sent';
                     friendBtn.disabled = true;
                 });
+                
+                // Show follow button if not friends
+                if (!user.friends?.includes(loggedInUser)) {
+                    followBtn.style.display = 'inline-block';
+                    friendBtn.style.display = 'none';
+                }
+            }
+
+            // Load friends and activity
+            displayFriends(username);
+            updateUserActivityFeed(username);
+            
+            // Start profile updates
+            profileUpdateInterval = setInterval(() => {
+                updateOnlineStatus(username);
+            }, 30000); // Check every 30 seconds
+        }
+
+        // Update online status in real-time
+        async function updateOnlineStatus(username) {
+            const users = await fetchUsers();
+            const user = users.find(u => u.username === username);
+            if (!user) return;
+            
+            const profile = user.profile || {};
+            const onlineStatusElement = document.getElementById('onlineStatus');
+            const onlineStatusIndicator = document.getElementById('onlineStatusIndicator');
+            const lastSeenElement = document.getElementById('lastSeen');
+            
+            if (profile.onlineStatus === 'online') {
+                onlineStatusElement.textContent = 'Online';
+                onlineStatusElement.className = 'detail-value online';
+                onlineStatusIndicator.className = 'online-status-indicator online';
+                onlineStatusIndicator.title = 'Online now';
+                lastSeenElement.textContent = 'Active now';
+            } else {
+                onlineStatusElement.textContent = 'Offline';
+                onlineStatusElement.className = 'detail-value offline';
+                onlineStatusIndicator.className = 'online-status-indicator offline';
+                onlineStatusIndicator.title = 'Offline';
+                lastSeenElement.textContent = 'Last seen: a while ago';
             }
         }
+
+        // Refresh friends list
+        document.getElementById('refreshFriends')?.addEventListener('click', function() {
+            const params = new URLSearchParams(window.location.search);
+            const username = params.get('username') || loggedInUser;
+            
+            this.classList.add('refreshing');
+            displayFriends(username).then(() => {
+                setTimeout(() => this.classList.remove('refreshing'), 500);
+            });
+        });
 
         // Mobile menu toggle
         document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
@@ -287,6 +460,11 @@
         window.onload = function() {
             loadProfile();
         };
+        
+        // Clean up interval when page unloads
+        window.addEventListener('beforeunload', function() {
+            clearInterval(profileUpdateInterval);
+        });
     </script>
 </body>
 </html>
