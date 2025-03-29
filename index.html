@@ -5,52 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friendora.space - Connect with Friends</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
-        <h1>Friendora.space</h1>
-        <nav>
-            <ul id="navLinks">
-                <li id="authLink"><a href="signup.html">Signup</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="terms.html">Terms</a></li>
-                <li><a href="privacy.html">Privacy</a></li>
-                <li><a href="feed.html">Feed</a></li>
-                <li><a href="qans.html">Q/Ans</a></li>
-            </ul>
-            <div id="userDropdown" class="dropdown" style="display: none;">
-                <span id="usernameDisplay"></span>
-                <div class="dropdown-content">
-                    <a href="edit-profile.html">Edit Profile</a>
-                    <a href="profile.html">View Profile</a>
-                    <a href="login.html" id="logoutLink">Log Out</a>
+        <div class="header-container">
+            <h1><i class="fas fa-users"></i> Friendora.space</h1>
+            <nav>
+                <ul id="navLinks">
+                    <li id="authLink"><a href="signup.html"><i class="fas fa-user-plus"></i> Signup</a></li>
+                    <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="terms.html"><i class="fas fa-file-contract"></i> Terms</a></li>
+                    <li><a href="privacy.html"><i class="fas fa-shield-alt"></i> Privacy</a></li>
+                    <li><a href="feed.html"><i class="fas fa-newspaper"></i> Feed</a></li>
+                    <li><a href="qans.html"><i class="fas fa-question-circle"></i> Q/Ans</a></li>
+                </ul>
+                <div id="userDropdown" class="dropdown" style="display: none;">
+                    <span id="usernameDisplay"><i class="fas fa-user-circle"></i> <span id="usernameText"></span></span>
+                    <div class="dropdown-content">
+                        <a href="edit-profile.html"><i class="fas fa-user-edit"></i> Edit Profile</a>
+                        <a href="profile.html"><i class="fas fa-user"></i> View Profile</a>
+                        <a href="login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+            <button id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+        </div>
     </header>
 
     <main>
-        <section class="description">
-            <h2>Welcome to Friendora.space</h2>
-            <p>
-                Friendora.space is your go-to platform for connecting with friends, sharing moments, and discovering new people. 
-                Whether you're here to catch up with old pals, explore a vibrant community feed, or engage in Q&A discussions, 
-                Friendora.space offers a simple, secure, and fun way to stay connected. Join today and be part of a growing 
-                network built for real connections in a digital world.
-            </p>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Connect with Friends, Share Your World</h2>
+                <p>Join our growing community to meet new people, share moments, and build meaningful connections.</p>
+                <div class="cta-buttons">
+                    <a href="signup.html" class="btn primary">Get Started</a>
+                    <a href="#features" class="btn secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f8e1c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="People connecting">
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <h2>Why Choose Friendora.space?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-user-shield"></i>
+                    <h3>Safe Space</h3>
+                    <p>Our community guidelines ensure a respectful environment for everyone.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-heart"></i>
+                    <h3>Real Connections</h3>
+                    <p>Find people who share your interests and values.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-comments"></i>
+                    <h3>Engaging Discussions</h3>
+                    <p>Participate in meaningful Q&A sessions with the community.</p>
+                </div>
+            </div>
         </section>
 
         <section class="search">
+            <h2>Find Friends</h2>
             <form id="searchForm" onsubmit="handleSearch(event)">
-                <input type="text" id="searchInput" placeholder="Search for a user..." required>
-                <button type="submit">Search</button>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search for a user..." required>
+                    <button type="submit"><i class="fas fa-search"></i> Search</button>
+                </div>
+                <p id="searchError" class="error"></p>
             </form>
-            <p id="searchError" class="error"></p>
+            <div id="recentUsers" class="recent-users">
+                <h3>Recently Active Users</h3>
+                <div id="recentUsersList" class="users-list"></div>
+            </div>
+        </section>
+
+        <section class="testimonials">
+            <h2>What Our Users Say</h2>
+            <div class="testimonial-slider">
+                <div class="testimonial active">
+                    <p>"Friendora helped me reconnect with old friends and make new ones!"</p>
+                    <div class="author">- Sarah J.</div>
+                </div>
+                <div class="testimonial">
+                    <p>"The community here is so welcoming and supportive."</p>
+                    <div class="author">- Michael T.</div>
+                </div>
+                <div class="testimonial">
+                    <p>"I love how easy it is to find people with similar interests."</p>
+                    <div class="author">- Priya K.</div>
+                </div>
+            </div>
         </section>
     </main>
 
     <footer>
-        <p>© 2025 Friendora.space. All rights reserved.</p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Friendora.space</h3>
+                <p>Connecting people since 2025</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Friendora.space. All rights reserved.</p>
+        </div>
     </footer>
 
     <script>
@@ -65,7 +143,7 @@
         function updateNavigation() {
             const authLink = document.getElementById('authLink');
             const userDropdown = document.getElementById('userDropdown');
-            const usernameDisplay = document.getElementById('usernameDisplay');
+            const usernameText = document.getElementById('usernameText');
 
             // Re-fetch loggedInUser in case it changed
             loggedInUser = localStorage.getItem('loggedInUser') || null;
@@ -73,10 +151,10 @@
             if (loggedInUser) {
                 authLink.style.display = 'none';
                 userDropdown.style.display = 'inline-block';
-                usernameDisplay.textContent = loggedInUser;
+                usernameText.textContent = loggedInUser;
             } else {
-                authLink.style.display = 'inline-block'; // Ensure it reappears when logged out
-                authLink.innerHTML = '<a href="signup.html">Signup</a>';
+                authLink.style.display = 'inline-block';
+                authLink.innerHTML = '<a href="signup.html"><i class="fas fa-user-plus"></i> Signup</a>';
                 userDropdown.style.display = 'none';
             }
         }
@@ -118,36 +196,89 @@
             }
 
             const users = await fetchUsers();
-            const foundUser = users.find(user => user.username === searchInput);
+            const foundUser = users.find(user => user.username.toLowerCase() === searchInput.toLowerCase());
 
             if (foundUser) {
                 window.location.href = `profile.html?username=${encodeURIComponent(foundUser.username)}`;
             } else {
-                searchError.textContent = 'User not found.';
+                searchError.textContent = 'User not found. Try a different username.';
+            }
+        }
+
+        // Display recent users
+        async function displayRecentUsers() {
+            const users = await fetchUsers();
+            const recentUsersList = document.getElementById('recentUsersList');
+            
+            // Sort users by last active (simulated)
+            const activeUsers = users
+                .filter(user => user.profile && user.profile.onlineStatus === 'online')
+                .sort(() => 0.5 - Math.random()) // Simulate recent activity
+                .slice(0, 5);
+            
+            if (activeUsers.length > 0) {
+                recentUsersList.innerHTML = activeUsers.map(user => `
+                    <div class="user-card" onclick="window.location.href='profile.html?username=${encodeURIComponent(user.username)}'">
+                        <div class="user-avatar">
+                            ${user.profile && user.profile.flair ? user.profile.flair : '👤'}
+                        </div>
+                        <div class="user-info">
+                            <span class="username">${user.username}</span>
+                            <span class="status online">Online</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                recentUsersList.innerHTML = '<p>No active users found.</p>';
             }
         }
 
         // Handle logout
-        document.getElementById('logoutLink').addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent immediate redirect
+        document.getElementById('logoutLink')?.addEventListener('click', function(e) {
+            e.preventDefault();
             localStorage.removeItem('loggedInUser');
             loggedInUser = null;
             updateNavigation();
-            window.location.href = 'login.html'; // Redirect after logout
+            window.location.href = 'login.html';
         });
 
-        // Initialize page and listen for storage changes
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Testimonial slider
+        function initTestimonialSlider() {
+            const testimonials = document.querySelectorAll('.testimonial');
+            let currentIndex = 0;
+            
+            function showTestimonial(index) {
+                testimonials.forEach((testimonial, i) => {
+                    testimonial.classList.toggle('active', i === index);
+                });
+            }
+            
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % testimonials.length;
+                showTestimonial(currentIndex);
+            }, 5000);
+        }
+
+        // Initialize page
         window.onload = function() {
             updateNavigation();
+            displayRecentUsers();
+            initTestimonialSlider();
+            
+            // Listen for changes in localStorage
+            window.addEventListener('storage', function(event) {
+                if (event.key === 'loggedInUser') {
+                    loggedInUser = localStorage.getItem('loggedInUser') || null;
+                    updateNavigation();
+                }
+            });
         };
-
-        // Listen for changes in localStorage (e.g., from other tabs or signup/login)
-        window.addEventListener('storage', function(event) {
-            if (event.key === 'loggedInUser') {
-                loggedInUser = localStorage.getItem('loggedInUser') || null;
-                updateNavigation();
-            }
-        });
     </script>
 </body>
 </html>
