@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Friendora.space - Profile</title>
+    <title>Friendora.space - Edit Profile</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,23 +11,70 @@
         <h1>Friendora.space</h1>
     </header>
     <main>
-        <h2 id="usernameTitle">Profile</h2>
-        <div class="profile-container">
-            <img id="profilePic" src="" alt="Profile Picture" style="display: none; max-width: 150px;">
-            <p><strong>Username:</strong> <span id="username"></span></p>
-            <p><strong>Nickname:</strong> <span id="nickname"></span></p>
-            <p><strong>Age:</strong> <span id="age"></span></p>
-            <p><strong>Height:</strong> <span id="height"></span> cm</p>
-            <p><strong>Bio:</strong> <span id="bio"></span></p>
-            <p><strong>College/School:</strong> <span id="education"></span></p>
-            <p><strong>Interests:</strong> <span id="interests"></span></p>
-            <p><strong>Flair:</strong> <span id="flair"></span></p>
-            <p><strong>Hobbies:</strong> <span id="hobbies"></span></p>
-            <p><strong>Favorite Things to Do:</strong> <span id="favThings"></span></p>
-            <p><strong>Relationship Status:</strong> <span id="relationship"></span></p>
-            <p><strong>Contact:</strong> <span id="contact"></span></p>
-            <p><strong>Status:</strong> <span id="onlineStatus"></span></p>
-        </div>
+        <h2>Edit Your Profile</h2>
+        <form id="editProfileForm" onsubmit="handleSave(event)">
+            <div class="form-group">
+                <label for="profilePic">Profile Picture:</label>
+                <input type="file" id="profilePic" accept="image/*">
+                <img id="previewPic" src="" alt="Preview" style="display: none; max-width: 100px;">
+            </div>
+            <div class="form-group">
+                <label for="nickname">Nickname:</label>
+                <input type="text" id="nickname" name="nickname">
+            </div>
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" min="13" max="120">
+            </div>
+            <div class="form-group">
+                <label for="height">Height (cm):</label>
+                <input type="number" id="height" name="height" min="50" max="300">
+            </div>
+            <div class="form-group">
+                <label for="bio">Bio:</label>
+                <textarea id="bio" name="bio" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="education">College/School (Mandatory):</label>
+                <input type="text" id="education" name="education" required>
+            </div>
+            <div class="form-group">
+                <label for="interests">Interests (comma-separated):</label>
+                <input type="text" id="interests" name="interests">
+            </div>
+            <div class="form-group">
+                <label for="flair">Flair (Emoji):</label>
+                <input type="text" id="flair" name="flair" maxlength="2" placeholder="e.g., 😊">
+            </div>
+            <div class="form-group">
+                <label for="hobbies">Hobbies (comma-separated):</label>
+                <input type="text" id="hobbies" name="hobbies">
+            </div>
+            <div class="form-group">
+                <label for="favThings">Favorite Things to Do (comma-separated):</label>
+                <input type="text" id="favThings" name="favThings">
+            </div>
+            <div class="form-group">
+                <label for="relationship">Relationship Status:</label>
+                <select id="relationship" name="relationship">
+                    <option value="">Select</option>
+                    <option value="Single">Single</option>
+                    <option value="In a Relationship">In a Relationship</option>
+                    <option value="Married">Married</option>
+                    <option value="Complicated">Complicated</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="contact">Contact Number:</label>
+                <input type="tel" id="contact" name="contact" pattern="[0-9]{10}" placeholder="10 digits">
+            </div>
+            <div class="form-group">
+                <label>Online Status:</label>
+                <label><input type="radio" name="onlineStatus" value="online" checked> Online</label>
+                <label><input type="radio" name="onlineStatus" value="offline"> Offline</label>
+            </div>
+            <button type="submit">Save</button>
+        </form>
         <p id="error" class="error"></p>
     </main>
 
@@ -35,6 +82,7 @@
         const API_KEY = '$2a$10$HNoicrOUVIdSCO7LAZz2t.3eGaPo9B2sdd.H/Kld6QJNV/putNShO';
         const BIN_ID = '67e720848a456b79667ea63a';
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        const loggedInUser = localStorage.getItem('loggedInUser');
 
         async function fetchUsers() {
             try {
@@ -51,51 +99,129 @@
             }
         }
 
-        async function loadProfile() {
-            const params = new URLSearchParams(window.location.search);
-            const urlUsername = params.get('username');
-            const loggedInUser = localStorage.getItem('loggedInUser');
-            const username = urlUsername || loggedInUser; // Prefer URL param, fallback to logged-in user
-            const errorElement = document.getElementById('error');
+        async function saveUsers(users) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify({ users })
+                });
+                if (!response.ok) throw new Error('Failed to save users');
+                return true;
+            } catch (error) {
+                console.error('Error saving users:', error);
+                return false;
+            }
+        }
 
-            if (!username) {
-                errorElement.textContent = 'No user specified. Please log in or search for a user.';
+        function sanitizeInput(input) {
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML.replace(/[<>&"']/g, '');
+        }
+
+        async function loadProfile() {
+            if (!loggedInUser) {
+                document.getElementById('error').textContent = 'Please log in to edit your profile.';
+                setTimeout(() => window.location.href = 'login.html', 2000); // Redirect after 2s
                 return;
             }
 
             const users = await fetchUsers();
-            const user = users.find(u => u.username === username);
-
+            const user = users.find(u => u.username === loggedInUser);
             if (!user) {
-                errorElement.textContent = 'User not found.';
-                document.getElementById('usernameTitle').textContent = 'Profile Not Found';
+                document.getElementById('error').textContent = 'User not found. Please sign up.';
+                setTimeout(() => window.location.href = 'signup.html', 2000);
                 return;
             }
 
-            // Display profile data
-            document.getElementById('usernameTitle').textContent = `${username}'s Profile`;
-            document.getElementById('username').textContent = username;
             const profile = user.profile || {};
-
+            document.getElementById('nickname').value = profile.nickname || '';
+            document.getElementById('age').value = profile.age || '';
+            document.getElementById('height').value = profile.height || '';
+            document.getElementById('bio').value = profile.bio || '';
+            document.getElementById('education').value = profile.education || '';
+            document.getElementById('interests').value = profile.interests || '';
+            document.getElementById('flair').value = profile.flair || '';
+            document.getElementById('hobbies').value = profile.hobbies || '';
+            document.getElementById('favThings').value = profile.favThings || '';
+            document.getElementById('relationship').value = profile.relationship || '';
+            document.getElementById('contact').value = profile.contact || '';
+            document.querySelector(`input[name="onlineStatus"][value="${profile.onlineStatus || 'online'}"]`).checked = true;
             if (profile.profilePic) {
-                document.getElementById('profilePic').src = profile.profilePic;
-                document.getElementById('profilePic').style.display = 'block';
-            } else {
-                document.getElementById('profilePic').style.display = 'none';
+                document.getElementById('previewPic').src = profile.profilePic;
+                document.getElementById('previewPic').style.display = 'block';
+            }
+        }
+
+        document.getElementById('profilePic').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('previewPic');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function handleSave(event) {
+            event.preventDefault();
+            const errorElement = document.getElementById('error');
+
+            if (!loggedInUser) {
+                errorElement.textContent = 'Please log in to save your profile.';
+                setTimeout(() => window.location.href = 'login.html', 2000);
+                return;
             }
 
-            document.getElementById('nickname').textContent = profile.nickname || 'Not set';
-            document.getElementById('age').textContent = profile.age || 'Not set';
-            document.getElementById('height').textContent = profile.height || 'Not set';
-            document.getElementById('bio').textContent = profile.bio || 'Not set';
-            document.getElementById('education').textContent = profile.education || 'Not set';
-            document.getElementById('interests').textContent = profile.interests || 'Not set';
-            document.getElementById('flair').textContent = profile.flair || 'Not set';
-            document.getElementById('hobbies').textContent = profile.hobbies || 'Not set';
-            document.getElementById('favThings').textContent = profile.favThings || 'Not set';
-            document.getElementById('relationship').textContent = profile.relationship || 'Not set';
-            document.getElementById('contact').textContent = profile.contact || 'Not set';
-            document.getElementById('onlineStatus').textContent = profile.onlineStatus || 'Not set';
+            const profilePic = document.getElementById('previewPic').src || '';
+            const nickname = sanitizeInput(document.getElementById('nickname').value.trim());
+            const age = document.getElementById('age').value;
+            const height = document.getElementById('height').value;
+            const bio = sanitizeInput(document.getElementById('bio').value.trim());
+            const education = sanitizeInput(document.getElementById('education').value.trim());
+            const interests = sanitizeInput(document.getElementById('interests').value.trim());
+            const flair = sanitizeInput(document.getElementById('flair').value.trim());
+            const hobbies = sanitizeInput(document.getElementById('hobbies').value.trim());
+            const favThings = sanitizeInput(document.getElementById('favThings').value.trim());
+            const relationship = document.getElementById('relationship').value;
+            const contact = sanitizeInput(document.getElementById('contact').value.trim());
+            const onlineStatus = document.querySelector('input[name="onlineStatus"]:checked').value;
+
+            if (!education) {
+                errorElement.textContent = 'College/School is mandatory.';
+                return;
+            }
+            if (contact && !/^[0-9]{10}$/.test(contact)) {
+                errorElement.textContent = 'Contact number must be 10 digits.';
+                return;
+            }
+
+            const users = await fetchUsers();
+            const userIndex = users.findIndex(u => u.username === loggedInUser);
+            if (userIndex === -1) {
+                errorElement.textContent = 'User not found. Please sign up.';
+                setTimeout(() => window.location.href = 'signup.html', 2000);
+                return;
+            }
+
+            users[userIndex].profile = {
+                profilePic, nickname, age, height, bio, education, interests, flair,
+                hobbies, favThings, relationship, contact, onlineStatus
+            };
+
+            const success = await saveUsers(users);
+            if (success) {
+                window.location.href = `profile.html?username=${encodeURIComponent(loggedInUser)}`;
+            } else {
+                errorElement.textContent = 'Failed to save profile. Please try again.';
+            }
         }
 
         window.onload = function() {
