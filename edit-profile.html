@@ -5,78 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friendora.space - Edit Profile</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
-        <h1>Friendora.space</h1>
+        <div class="header-container">
+            <h1><i class="fas fa-users"></i> Friendora.space</h1>
+            <nav>
+                <ul id="navLinks">
+                    <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="feed.html"><i class="fas fa-newspaper"></i> Feed</a></li>
+                    <li><a href="qans.html"><i class="fas fa-question-circle"></i> Q/Ans</a></li>
+                </ul>
+                <div id="userDropdown" class="dropdown">
+                    <span id="usernameDisplay"><i class="fas fa-user-circle"></i> <span id="usernameText"></span></span>
+                    <div class="dropdown-content">
+                        <a href="edit-profile.html"><i class="fas fa-user-edit"></i> Edit Profile</a>
+                        <a href="profile.html"><i class="fas fa-user"></i> View Profile</a>
+                        <a href="login.html" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    </div>
+                </div>
+            </nav>
+            <button id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+        </div>
     </header>
-    <main>
-        <h2>Edit Your Profile</h2>
+
+    <main class="edit-profile-main">
+        <h1><i class="fas fa-user-edit"></i> Edit Your Profile</h1>
+        
         <form id="editProfileForm" onsubmit="handleSave(event)">
-            <div class="form-group">
-                <label for="profilePic">Profile Picture:</label>
-                <input type="file" id="profilePic" accept="image/*">
-                <img id="previewPic" src="" alt="Preview" style="display: none; max-width: 100px;">
+            <div class="form-section">
+                <h2><i class="fas fa-id-card"></i> Basic Information</h2>
+                
+                <div class="form-group avatar-upload">
+                    <label for="profilePic">Profile Picture:</label>
+                    <div class="avatar-preview-container">
+                        <div class="avatar-preview" id="avatarPreview">
+                            <span id="avatarFlairPreview">👤</span>
+                            <img id="previewPic" src="" alt="Preview" style="display: none;">
+                        </div>
+                        <div class="avatar-upload-controls">
+                            <label for="profilePic" class="btn"><i class="fas fa-camera"></i> Choose Image</label>
+                            <input type="file" id="profilePic" accept="image/*" style="display: none;">
+                            <button type="button" id="removePicBtn" class="btn secondary"><i class="fas fa-trash"></i> Remove</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nickname">Nickname:</label>
+                        <input type="text" id="nickname" name="nickname" placeholder="Your nickname">
+                    </div>
+                    <div class="form-group">
+                        <label for="flair">Flair (Emoji):</label>
+                        <div class="emoji-input">
+                            <input type="text" id="flair" name="flair" maxlength="2" placeholder="😊">
+                            <div class="emoji-picker-btn" id="emojiPickerBtn">
+                                <i class="far fa-smile"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" name="age" min="13" max="120" placeholder="Your age">
+                    </div>
+                    <div class="form-group">
+                        <label for="height">Height (cm):</label>
+                        <input type="number" id="height" name="height" min="50" max="300" placeholder="Your height">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bio">Bio:</label>
+                    <textarea id="bio" name="bio" rows="4" placeholder="Tell others about yourself"></textarea>
+                    <div class="char-count"><span id="bioCharCount">0</span>/200</div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="nickname">Nickname:</label>
-                <input type="text" id="nickname" name="nickname">
+            
+            <div class="form-section">
+                <h2><i class="fas fa-graduation-cap"></i> Education & Contact</h2>
+                
+                <div class="form-group">
+                    <label for="education">College/School (Mandatory):</label>
+                    <input type="text" id="education" name="education" required placeholder="Where you study/work">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="relationship">Relationship Status:</label>
+                        <select id="relationship" name="relationship">
+                            <option value="">Select status</option>
+                            <option value="Single">Single</option>
+                            <option value="In a Relationship">In a Relationship</option>
+                            <option value="Married">Married</option>
+                            <option value="Complicated">Complicated</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">Contact Number:</label>
+                        <input type="tel" id="contact" name="contact" pattern="[0-9]{10}" placeholder="10 digits">
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="age">Age:</label>
-                <input type="number" id="age" name="age" min="13" max="120">
+            
+            <div class="form-section">
+                <h2><i class="fas fa-heart"></i> Interests & Activities</h2>
+                
+                <div class="form-group">
+                    <label for="interests">Interests (comma-separated):</label>
+                    <input type="text" id="interests" name="interests" placeholder="e.g., Music, Travel, Technology">
+                </div>
+                
+                <div class="form-group">
+                    <label for="hobbies">Hobbies (comma-separated):</label>
+                    <input type="text" id="hobbies" name="hobbies" placeholder="e.g., Photography, Cooking, Gaming">
+                </div>
+                
+                <div class="form-group">
+                    <label for="favThings">Favorite Things to Do (comma-separated):</label>
+                    <input type="text" id="favThings" name="favThings" placeholder="e.g., Hiking, Reading, Movies">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="height">Height (cm):</label>
-                <input type="number" id="height" name="height" min="50" max="300">
+            
+            <div class="form-section">
+                <h2><i class="fas fa-user-shield"></i> Privacy Settings</h2>
+                
+                <div class="form-group">
+                    <label>Online Status:</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="onlineStatus" value="online" checked>
+                            <span class="radio-checkmark"></span>
+                            <span class="radio-label">Online</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="onlineStatus" value="offline">
+                            <span class="radio-checkmark"></span>
+                            <span class="radio-label">Offline</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="profileVisibility">Profile Visibility:</label>
+                    <select id="profileVisibility" name="profileVisibility">
+                        <option value="public">Public (Anyone can view)</option>
+                        <option value="friends">Friends Only</option>
+                        <option value="private">Private (Only me)</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="bio">Bio:</label>
-                <textarea id="bio" name="bio" rows="4"></textarea>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn primary"><i class="fas fa-save"></i> Save Profile</button>
+                <button type="button" class="btn secondary" onclick="window.location.href='profile.html'">Cancel</button>
             </div>
-            <div class="form-group">
-                <label for="education">College/School (Mandatory):</label>
-                <input type="text" id="education" name="education" required>
-            </div>
-            <div class="form-group">
-                <label for="interests">Interests (comma-separated):</label>
-                <input type="text" id="interests" name="interests">
-            </div>
-            <div class="form-group">
-                <label for="flair">Flair (Emoji):</label>
-                <input type="text" id="flair" name="flair" maxlength="2" placeholder="e.g., 😊">
-            </div>
-            <div class="form-group">
-                <label for="hobbies">Hobbies (comma-separated):</label>
-                <input type="text" id="hobbies" name="hobbies">
-            </div>
-            <div class="form-group">
-                <label for="favThings">Favorite Things to Do (comma-separated):</label>
-                <input type="text" id="favThings" name="favThings">
-            </div>
-            <div class="form-group">
-                <label for="relationship">Relationship Status:</label>
-                <select id="relationship" name="relationship">
-                    <option value="">Select</option>
-                    <option value="Single">Single</option>
-                    <option value="In a Relationship">In a Relationship</option>
-                    <option value="Married">Married</option>
-                    <option value="Complicated">Complicated</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="contact">Contact Number:</label>
-                <input type="tel" id="contact" name="contact" pattern="[0-9]{10}" placeholder="10 digits">
-            </div>
-            <div class="form-group">
-                <label>Online Status:</label>
-                <label><input type="radio" name="onlineStatus" value="online" checked> Online</label>
-                <label><input type="radio" name="onlineStatus" value="offline"> Offline</label>
-            </div>
-            <button type="submit">Save</button>
         </form>
+        
         <p id="error" class="error"></p>
+        
+        <div class="emoji-picker-container" id="emojiPickerContainer">
+            <div class="emoji-picker">
+                <div class="emoji-categories">
+                    <button type="button" data-category="smileys">😀</button>
+                    <button type="button" data-category="animals">🐻</button>
+                    <button type="button" data-category="food">🍎</button>
+                    <button type="button" data-category="activities">⚽</button>
+                </div>
+                <div class="emoji-grid" id="emojiGrid"></div>
+                <button type="button" class="close-emoji-picker" id="closeEmojiPicker">Close</button>
+            </div>
+        </div>
     </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 Friendora.space. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
         const API_KEY = '$2a$10$HNoicrOUVIdSCO7LAZz2t.3eGaPo9B2sdd.H/Kld6QJNV/putNShO';
@@ -84,6 +194,23 @@
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
         const loggedInUser = localStorage.getItem('loggedInUser');
 
+        // Emoji data
+        const emojis = {
+            smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚'],
+            animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦄'],
+            food: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🍍', '🥝', '🥥', '🥦', '🥬', '🥕', '🌽', '🥔'],
+            activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁']
+        };
+
+        // Update navigation based on login status
+        function updateNavigation() {
+            const usernameText = document.getElementById('usernameText');
+            if (loggedInUser) {
+                usernameText.textContent = loggedInUser;
+            }
+        }
+
+        // Fetch users from JSONBin
         async function fetchUsers() {
             try {
                 const response = await fetch(API_URL, {
@@ -99,6 +226,7 @@
             }
         }
 
+        // Save users to JSONBin
         async function saveUsers(users) {
             try {
                 const response = await fetch(API_URL, {
@@ -117,16 +245,20 @@
             }
         }
 
+        // Sanitize input
         function sanitizeInput(input) {
             const div = document.createElement('div');
             div.textContent = input;
             return div.innerHTML.replace(/[<>&"']/g, '');
         }
 
+        // Load profile data
         async function loadProfile() {
+            updateNavigation();
+            
             if (!loggedInUser) {
                 document.getElementById('error').textContent = 'Please log in to edit your profile.';
-                setTimeout(() => window.location.href = 'login.html', 2000); // Redirect after 2s
+                setTimeout(() => window.location.href = 'login.html', 2000);
                 return;
             }
 
@@ -139,24 +271,48 @@
             }
 
             const profile = user.profile || {};
+            
+            // Basic info
             document.getElementById('nickname').value = profile.nickname || '';
+            document.getElementById('flair').value = profile.flair || '';
             document.getElementById('age').value = profile.age || '';
             document.getElementById('height').value = profile.height || '';
             document.getElementById('bio').value = profile.bio || '';
             document.getElementById('education').value = profile.education || '';
             document.getElementById('interests').value = profile.interests || '';
-            document.getElementById('flair').value = profile.flair || '';
             document.getElementById('hobbies').value = profile.hobbies || '';
             document.getElementById('favThings').value = profile.favThings || '';
             document.getElementById('relationship').value = profile.relationship || '';
             document.getElementById('contact').value = profile.contact || '';
             document.querySelector(`input[name="onlineStatus"][value="${profile.onlineStatus || 'online'}"]`).checked = true;
+            
+            // Profile picture
             if (profile.profilePic) {
                 document.getElementById('previewPic').src = profile.profilePic;
                 document.getElementById('previewPic').style.display = 'block';
+                document.getElementById('avatarFlairPreview').style.display = 'none';
+            } else if (profile.flair) {
+                document.getElementById('avatarFlairPreview').textContent = profile.flair;
+            }
+            
+            // Update bio character count
+            updateBioCharCount();
+        }
+
+        // Update bio character count
+        function updateBioCharCount() {
+            const bio = document.getElementById('bio');
+            const charCount = document.getElementById('bioCharCount');
+            charCount.textContent = bio.value.length;
+            
+            if (bio.value.length > 200) {
+                charCount.style.color = 'red';
+            } else {
+                charCount.style.color = '';
             }
         }
 
+        // Handle profile picture upload
         document.getElementById('profilePic').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -165,11 +321,64 @@
                     const preview = document.getElementById('previewPic');
                     preview.src = e.target.result;
                     preview.style.display = 'block';
+                    document.getElementById('avatarFlairPreview').style.display = 'none';
                 };
                 reader.readAsDataURL(file);
             }
         });
 
+        // Remove profile picture
+        document.getElementById('removePicBtn').addEventListener('click', function() {
+            document.getElementById('previewPic').src = '';
+            document.getElementById('previewPic').style.display = 'none';
+            document.getElementById('avatarFlairPreview').style.display = 'block';
+            document.getElementById('profilePic').value = '';
+        });
+
+        // Initialize emoji picker
+        function initEmojiPicker() {
+            const emojiPickerBtn = document.getElementById('emojiPickerBtn');
+            const emojiPickerContainer = document.getElementById('emojiPickerContainer');
+            const emojiGrid = document.getElementById('emojiGrid');
+            const closeEmojiPicker = document.getElementById('closeEmojiPicker');
+            const flairInput = document.getElementById('flair');
+            
+            // Show emoji picker
+            emojiPickerBtn.addEventListener('click', function() {
+                emojiPickerContainer.style.display = 'block';
+                showEmojiCategory('smileys');
+            });
+            
+            // Close emoji picker
+            closeEmojiPicker.addEventListener('click', function() {
+                emojiPickerContainer.style.display = 'none';
+            });
+            
+            // Category buttons
+            document.querySelectorAll('[data-category]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    showEmojiCategory(category);
+                });
+            });
+            
+            // Show emojis for a category
+            function showEmojiCategory(category) {
+                emojiGrid.innerHTML = emojis[category].map(emoji => `
+                    <button type="button" class="emoji-btn">${emoji}</button>
+                `).join('');
+                
+                // Add click handlers to emoji buttons
+                document.querySelectorAll('.emoji-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        flairInput.value = this.textContent;
+                        emojiPickerContainer.style.display = 'none';
+                    });
+                });
+            }
+        }
+
+        // Handle form submission
         async function handleSave(event) {
             event.preventDefault();
             const errorElement = document.getElementById('error');
@@ -182,20 +391,26 @@
 
             const profilePic = document.getElementById('previewPic').src || '';
             const nickname = sanitizeInput(document.getElementById('nickname').value.trim());
+            const flair = sanitizeInput(document.getElementById('flair').value.trim());
             const age = document.getElementById('age').value;
             const height = document.getElementById('height').value;
             const bio = sanitizeInput(document.getElementById('bio').value.trim());
             const education = sanitizeInput(document.getElementById('education').value.trim());
             const interests = sanitizeInput(document.getElementById('interests').value.trim());
-            const flair = sanitizeInput(document.getElementById('flair').value.trim());
             const hobbies = sanitizeInput(document.getElementById('hobbies').value.trim());
             const favThings = sanitizeInput(document.getElementById('favThings').value.trim());
             const relationship = document.getElementById('relationship').value;
             const contact = sanitizeInput(document.getElementById('contact').value.trim());
             const onlineStatus = document.querySelector('input[name="onlineStatus"]:checked').value;
+            const profileVisibility = document.getElementById('profileVisibility').value;
 
+            // Validation
             if (!education) {
                 errorElement.textContent = 'College/School is mandatory.';
+                return;
+            }
+            if (bio.length > 200) {
+                errorElement.textContent = 'Bio must be 200 characters or less.';
                 return;
             }
             if (contact && !/^[0-9]{10}$/.test(contact)) {
@@ -211,11 +426,13 @@
                 return;
             }
 
+            // Update user profile
             users[userIndex].profile = {
-                profilePic, nickname, age, height, bio, education, interests, flair,
-                hobbies, favThings, relationship, contact, onlineStatus
+                profilePic, nickname, flair, age, height, bio, education, interests,
+                hobbies, favThings, relationship, contact, onlineStatus, profileVisibility
             };
 
+            // Save to JSONBin
             const success = await saveUsers(users);
             if (success) {
                 window.location.href = `profile.html?username=${encodeURIComponent(loggedInUser)}`;
@@ -224,8 +441,19 @@
             }
         }
 
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Initialize page
         window.onload = function() {
             loadProfile();
+            initEmojiPicker();
+            
+            // Bio character count
+            document.getElementById('bio').addEventListener('input', updateBioCharCount);
         };
     </script>
 </body>
