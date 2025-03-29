@@ -3,152 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Friendora QnA</title>
+    <title>Friendora.space - Q&A Community</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <h1>Friendora QnA</h1>
+    <header>
+        <div class="header-content">
+            <h1>Friendora.space</h1>
+            <p>Your community Q&A platform</p>
+        </div>
+    </header>
 
-    <input type="text" id="title" placeholder="Title">
-    <textarea id="question" placeholder="Ask your question..."></textarea>
-    <button id="postQuestion">Post Question</button>
+    <main>
+        <section class="create-post">
+            <h2>Ask a Question</h2>
+            <form id="postForm">
+                <div class="form-group">
+                    <label for="username">Username*</label>
+                    <input type="text" id="username" required placeholder="Your public username" maxlength="30">
+                </div>
+                <div class="form-group">
+                    <label for="title">Title*</label>
+                    <input type="text" id="title" required placeholder="Question title" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description*</label>
+                    <textarea id="description" required placeholder="Describe your question in detail" maxlength="1000"></textarea>
+                </div>
+                <button type="submit" id="postSubmitBtn">Post Question</button>
+            </form>
+        </section>
 
-    <div id="questionsList"></div>
+        <section class="posts-container">
+            <div class="section-header">
+                <h2>Community Questions</h2>
+                <div class="sort-options">
+                    <select id="sortBy">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="mostLiked">Most Liked</option>
+                        <option value="mostCommented">Most Comments</option>
+                    </select>
+                </div>
+            </div>
+            <div id="postsList" class="posts-list"></div>
+        </section>
+    </main>
 
-    <!-- Firebase Configuration -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, deleteDoc, updateDoc, getDocs, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyD2Wfgw21kOifIJPJKm0cyrzPphwPRXAfc",
-            authDomain: "qnans-247a9.firebaseapp.com",
-            projectId: "qnans-247a9",
-            storageBucket: "qnans-247a9.appspot.com",
-            messagingSenderId: "166245193762",
-            appId: "1:166245193762:web:56d2e0267083842476d27b"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Generate a random userId for this session (no authentication)
-        const userId = Math.random().toString(36).substring(2, 15);
-
-        document.getElementById("postQuestion").addEventListener("click", async () => {
-            const title = document.getElementById("title").value.trim();
-            const question = document.getElementById("question").value.trim();
-
-            if (!title || !question) {
-                alert("All fields are mandatory");
-                return;
-            }
-
-            await addDoc(collection(db, "questions"), { 
-                userId, 
-                title, 
-                question, 
-                reactions: 0, 
-                timestamp: Date.now() 
-            });
-            document.getElementById("title").value = "";
-            document.getElementById("question").value = "";
-        });
-
-        async function loadQuestions() {
-            const querySnapshot = await getDocs(collection(db, "questions"));
-            const questionsList = document.getElementById("questionsList");
-            questionsList.innerHTML = "";
-
-            querySnapshot.forEach(async (docSnap) => {
-                const data = docSnap.data();
-                const div = document.createElement("div");
-                div.className = "question";
-                div.innerHTML = `
-                    <h3>${data.title}</h3>
-                    <p>${data.question}</p>
-                    <button onclick="react('${docSnap.id}', '${data.reactions}')">Like (${data.reactions})</button>
-                    ${data.userId === userId ? `
-                        <button onclick="editQuestion('${docSnap.id}', '${data.title}', '${data.question}')">Edit</button>
-                        <button onclick="deleteQuestion('${docSnap.id}')">Delete</button>
-                    ` : ''}
-                    <div id="comments-${docSnap.id}">
-                        <input type="text" id="comment-${docSnap.id}" placeholder="Write a comment...">
-                        <button onclick="addComment('${docSnap.id}')">Post Comment</button>
-                        <div id="commentList-${docSnap.id}"></div>
+    <div id="commentsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <div class="post-meta">
+                    <span id="modalUsername"></span>
+                    <span id="modalTimestamp"></span>
+                </div>
+            </div>
+            <p id="modalDescription"></p>
+            <div class="reactions">
+                <button id="likeBtn" class="reaction-btn">
+                    <span id="likeCount">0</span> 👍
+                </button>
+                <button id="dislikeBtn" class="reaction-btn">
+                    <span id="dislikeCount">0</span> 👎
+                </button>
+            </div>
+            <div class="comments-section">
+                <h4>Comments (<span id="commentsCount">0</span>)</h4>
+                <div id="commentsList" class="comments-list"></div>
+                <form id="commentForm">
+                    <div class="form-group">
+                        <label for="commentUsername">Username*</label>
+                        <input type="text" id="commentUsername" placeholder="Your username" required maxlength="30">
                     </div>
-                `;
-                questionsList.appendChild(div);
-                loadComments(docSnap.id);
-            });
-        }
+                    <div class="form-group">
+                        <label for="commentText">Comment*</label>
+                        <textarea id="commentText" placeholder="Add a comment" required maxlength="500"></textarea>
+                    </div>
+                    <button type="submit" id="commentSubmitBtn">Post Comment</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-        window.editQuestion = async function(id, oldTitle, oldQuestion) {
-            const newTitle = prompt("Edit Title:", oldTitle);
-            const newQuestion = prompt("Edit Question:", oldQuestion);
+    <footer>
+        <p>Friendora.space © 2025 - A simple Q&A community</p>
+    </footer>
 
-            if (newTitle && newQuestion) {
-                await updateDoc(doc(db, "questions", id), { title: newTitle, question: newQuestion });
-            }
-        }
-
-        window.deleteQuestion = async function(id) {
-            if (confirm("Are you sure you want to delete this question?")) {
-                await deleteDoc(doc(db, "questions", id));
-            }
-        }
-
-        window.react = async function(id, currentReactions) {
-            const reactionRef = doc(db, `questions/${id}/reactions/${userId}`);
-            const reactionSnap = await getDoc(reactionRef);
-
-            if (reactionSnap.exists()) {
-                alert("You have already reacted!");
-                return;
-            }
-
-            await setDoc(reactionRef, { userId });
-            await updateDoc(doc(db, "questions", id), { reactions: parseInt(currentReactions) + 1 });
-        }
-
-        window.addComment = async function(questionId) {
-            const commentText = document.getElementById(`comment-${questionId}`).value.trim();
-
-            if (!commentText) {
-                alert("Comment cannot be empty!");
-                return;
-            }
-
-            await addDoc(collection(db, `questions/${questionId}/comments`), { 
-                userId, 
-                comment: commentText, 
-                timestamp: Date.now() 
-            });
-            document.getElementById(`comment-${questionId}`).value = "";
-            loadComments(questionId);
-        }
-
-        async function loadComments(questionId) {
-            const commentsDiv = document.getElementById(`commentList-${questionId}`);
-            commentsDiv.innerHTML = "";
-            const querySnapshot = await getDocs(collection(db, `questions/${questionId}/comments`));
-
-            querySnapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                const div = document.createElement("div");
-                div.innerHTML = `<p>${data.comment} ${data.userId === userId ? '<button onclick="deleteComment(\'' + questionId + '\', \'' + docSnap.id + '\')">Delete</button>' : ''}</p>`;
-                commentsDiv.appendChild(div);
-            });
-        }
-
-        window.deleteComment = async function(questionId, commentId) {
-            if (confirm("Are you sure you want to delete this comment?")) {
-                await deleteDoc(doc(db, `questions/${questionId}/comments`, commentId));
-                loadComments(questionId);
-            }
-        }
-
-        onSnapshot(collection(db, "questions"), loadQuestions);
-    </script>
+    <script src="index.js"></script>
 </body>
 </html>
